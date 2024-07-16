@@ -9,9 +9,6 @@ function selectTopics() {
     )
     .then(({ rows }) => {
       return rows;
-    })
-    .catch((err) => {
-      next(err);
     });
 }
 
