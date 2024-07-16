@@ -29,6 +29,19 @@ describe("/api/topics", () => {
     });
   });
 });
+describe("/api", () => {
+  describe("GET request", () => {
+    test("responds with json representation of all the available endpoints of the api", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body: { endpoints } }) => {
+          expect(endpoints).toEqual(endpoints);
+        });
+    });
+  });
+});
+
 describe("invalid enpoint", () => {
   describe("GET request", () => {
     test("given an endpoint that does not exist, responds with a status 404 and error message", () => {
