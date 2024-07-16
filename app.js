@@ -13,8 +13,4 @@ app.all("*", (request, response, next) => {
   response.status(404).send({ msg: "path not found" });
 }); // response for an invalid enpoint
 
-app.listen(8080, () => {
-  console.log(`Listening on port ${8080}`);
-});
-
 module.exports = app;
