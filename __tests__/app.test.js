@@ -3,6 +3,7 @@ const request = require("supertest");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const db = require("../db/connection");
+const endpointsFile = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(testData);
@@ -36,34 +37,52 @@ describe("/api", () => {
         .get("/api")
         .expect(200)
         .then(({ body: { endpoints } }) => {
-          expect(endpoints).toEqual(endpoints);
+          expect(endpoints).toEqual(endpointsFile);
         });
     });
   });
 });
 
-xdescribe("/api/articles/:article_id", () => {
+describe("/api/articles/:article_id", () => {
   describe("GET", () => {
     test("responds with status 200 and an article object and specified properties", () => {
       return request(app)
-        .get("/api/articles/5")
+        .get("/api/articles/1")
         .expect(200)
         .then(({ body: { article } }) => {
-          expect(article).toMatchObject({
-            title: "UNCOVERED: catspiracy to bring down democracy",
-            topic: "cats",
-            author: "rogersop",
-            body: "Bastet walks amongst us, and the cats are taking arms!",
-            created_at: 1596464040000,
+          expect(article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 100,
             article_img_url:
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           });
         });
     });
+    test("responds with a status 400 when given an invalid type for article_id", () => {
+      return request(app)
+        .get("/api/articles/not-a-number")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("400 - Bad request");
+        });
+    });
+    test("responds with a status 404 not found, when given a valid article_id type that does not exist", () => {
+      return request(app)
+        .get("/api/articles/808")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("No article found under id 808");
+        });
+    });
   });
 });
 
-describe("invalid enpoint", () => {
+describe("Invalid endpoint", () => {
   describe("GET request", () => {
     test("given an endpoint that does not exist, responds with a status 404 and error message", () => {
       return request(app)
