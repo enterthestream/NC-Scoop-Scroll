@@ -1,7 +1,11 @@
 const express = require("express");
 const { getTopics } = require("./controllers/topics.controllers");
-const { invalidEndpoint } = require("./error-handlers");
+const { getEndpoints } = require("./controllers/api.controllers");
 const app = express();
+
+app.use(express.json());
+
+app.get("/api", getEndpoints);
 
 app.get("/api/topics", getTopics);
 
