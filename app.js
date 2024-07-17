@@ -1,5 +1,10 @@
 const express = require("express");
-const { getEndpoints, getTopics, getArticleById } = require("./controllers");
+const {
+  getEndpoints,
+  getTopics,
+  getArticleById,
+  getArticles,
+} = require("./controllers");
 const { invalidArticleIdType, articleIdNotFound } = require("./error-handlers");
 const app = express();
 
@@ -8,6 +13,8 @@ app.use(express.json());
 app.get("/api", getEndpoints);
 
 app.get("/api/topics", getTopics);
+
+app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
 

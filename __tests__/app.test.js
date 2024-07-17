@@ -4,6 +4,7 @@ const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const db = require("../db/connection");
 const endpointsFile = require("../endpoints.json");
+const articles = require("../db/data/test-data/articles");
 
 beforeEach(() => {
   return seed(testData);
@@ -77,6 +78,37 @@ describe("/api/articles/:article_id", () => {
         .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("No article found under id 808");
+        });
+    });
+  });
+});
+describe("/api/articles", () => {
+  describe("GET", () => {
+    test("responds with a status 200 and an array of article objects with the specified properties", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: expect.any(String),
+              author: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+    });
+    test("returns array of article objects ordered by date in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("created_at", { descending: true });
         });
     });
   });
