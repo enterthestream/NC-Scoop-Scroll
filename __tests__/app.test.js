@@ -113,6 +113,59 @@ describe("/api/articles", () => {
     });
   });
 });
+describe("/api/articles/:article_id/comments", () => {
+  describe("GET", () => {
+    test("responds with a status 200 and an array of comments for the given article_id, with the specified properties", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toHaveLength(11);
+          comments.forEach((comment) => {
+            expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+            });
+          });
+        });
+    });
+    test("returns array of comments ordered by date in descending order (most recent comments first)", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .then(({ body: { comments } }) => {
+          expect(comments).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+    test("responds with a status 400 when given an invalid type for article_id", () => {
+      return request(app)
+        .get("/api/articles/not-a-number/comments")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("400 - Bad request");
+        });
+    });
+    test("responds with a status 404 not found, when given a valid article_id type that does not exist", () => {
+      return request(app)
+        .get("/api/articles/808/comments")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("No article found under id 808");
+        });
+    });
+    test("responds with a status 200 and an empty array, when given a valid article_id that exists but has no comments", () => {
+      return request(app)
+        .get("/api/articles/7/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toEqual([]);
+        });
+    });
+  });
+});
 
 describe("Invalid endpoint", () => {
   describe("GET request", () => {

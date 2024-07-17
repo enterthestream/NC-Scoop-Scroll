@@ -1,4 +1,9 @@
-const { selectArticleById, selectArticles } = require("../models");
+const {
+  selectArticleById,
+  selectArticles,
+  selectCommentsByArticleId,
+  checkArticleExists,
+} = require("../models");
 
 exports.getArticles = (request, response, next) => {
   selectArticles()
@@ -13,11 +18,35 @@ exports.getArticles = (request, response, next) => {
 
 exports.getArticleById = (request, response, next) => {
   const { article_id } = request.params;
-  selectArticleById(article_id)
+  checkArticleExists(article_id)
+    .then(() => {
+      return selectArticleById(article_id);
+    })
     .then((article) => {
       response.status(200).send({ article });
     })
     .catch((err) => {
       next(err);
     });
+};
+
+exports.getCommentsByArticleId = (request, response, next) => {
+  const { article_id } = request.params;
+  checkArticleExists(article_id)
+    .then(() => {
+      return selectCommentsByArticleId(article_id);
+    })
+    .then((comments) => {
+      response.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+  /* selectCommentsByArticleId(article_id)
+    .then((comments) => {
+      response.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    }); */
 };
