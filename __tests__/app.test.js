@@ -116,8 +116,9 @@ describe("/api/articles", () => {
 describe("/api/articles/:article_id/comments", () => {
   describe("GET", () => {
     test("responds with a status 200 and an array of comments for the given article_id, with the specified properties", () => {
+      const articleId = 1;
       return request(app)
-        .get("/api/articles/1/comments")
+        .get(`/api/articles/${articleId}/comments`)
         .expect(200)
         .then(({ body: { comments } }) => {
           expect(comments).toHaveLength(11);
@@ -128,7 +129,7 @@ describe("/api/articles/:article_id/comments", () => {
               created_at: expect.any(String),
               author: expect.any(String),
               body: expect.any(String),
-              article_id: expect.any(Number),
+              article_id: articleId,
             });
           });
         });
@@ -162,6 +163,69 @@ describe("/api/articles/:article_id/comments", () => {
         .expect(200)
         .then(({ body: { comments } }) => {
           expect(comments).toEqual([]);
+        });
+    });
+  });
+  describe("POST", () => {
+    test("responds with a status 201 and newly posted comment", () => {
+      const postObj = {
+        username: "butter_bridge",
+        body: "Mitch should definitely grow a handsome Dallas on his face, it would look glorious.",
+      };
+      const articleId = 12;
+      return request(app)
+        .post(`/api/articles/${articleId}/comments`)
+        .send(postObj)
+        .expect(201)
+        .then(({ body: { comment } }) => {
+          expect(comment).toEqual({
+            comment_id: 19,
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: "butter_bridge",
+            body: "Mitch should definitely grow a handsome Dallas on his face, it would look glorious.",
+            article_id: articleId,
+          });
+        });
+    });
+    test("responds with a status 404 not found when username does not exist", () => {
+      const postObj = {
+        username: "non-existent-user",
+        body: "Mitch should not grow a handsome Dallas on his face, it would not look so glorious.",
+      };
+      const articleId = 12;
+      return request(app)
+        .post(`/api/articles/${articleId}/comments`)
+        .send(postObj)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe(`404 - ${postObj.username} not found`);
+        });
+    });
+    test("responds with a status 400 when given an invalid type for article_id", () => {
+      const postObj = {
+        username: "butter_bridge",
+        body: "Mitch should definitely grow a handsome Dallas on his face, it would look glorious.",
+      };
+      return request(app)
+        .post("/api/articles/not-a-number/comments")
+        .send(postObj)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("400 - Bad request");
+        });
+    });
+    test("responds with a status 404 not found, when given a valid article_id type that does not exist", () => {
+      const postObj = {
+        username: "butter_bridge",
+        body: "Mitch should definitely grow a handsome Dallas on his face, it would look glorious.",
+      };
+      return request(app)
+        .post("/api/articles/808/comments")
+        .send(postObj)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("No article found under id 808");
         });
     });
   });

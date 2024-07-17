@@ -74,9 +74,27 @@ function selectCommentsByArticleId(articleId) {
     });
 }
 
+function insertComment(articleId, author, body) {
+  return db
+    .query(
+      `
+      INSERT INTO comments (article_id, author, body)
+      SELECT $1, $2, $3
+      FROM articles
+      WHERE articles.article_id = $1
+      RETURNING *
+      `,
+      [articleId, author, body]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+}
+
 module.exports = {
   selectArticleById,
   selectArticles,
   selectCommentsByArticleId,
   checkArticleExists,
+  insertComment,
 };

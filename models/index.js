@@ -3,6 +3,7 @@ const {
   selectArticles,
   selectCommentsByArticleId,
   checkArticleExists,
+  insertComment,
 } = require("./articles.model");
 const { selectTopics } = require("./topics.models");
 
@@ -12,4 +13,5 @@ module.exports = {
   selectArticles,
   selectCommentsByArticleId,
   checkArticleExists,
+  insertComment,
 };
