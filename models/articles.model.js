@@ -28,14 +28,55 @@ function selectArticleById(articleId) {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [articleId])
     .then(({ rows }) => {
+      return rows[0];
+    });
+}
+
+function checkArticleExists(articleId) {
+  return db
+    .query(
+      `
+      SELECT article_id FROM articles
+      WHERE article_id =$1
+      `,
+      [articleId]
+    )
+    .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({
           status: 404,
           msg: `No article found under id ${articleId}`,
         });
       }
-      return rows[0];
     });
 }
 
-module.exports = { selectArticleById, selectArticles };
+function selectCommentsByArticleId(articleId) {
+  return db
+    .query(
+      `
+      SELECT
+        comments.comment_id,
+        comments.votes,
+        comments.created_at,
+        comments.author,
+        comments.body,
+        comments.article_id
+      FROM comments
+      LEFT JOIN articles ON comments.article_id = articles.article_id
+      WHERE articles.article_id = $1
+      ORDER BY comments.created_at DESC
+      `,
+      [articleId]
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+}
+
+module.exports = {
+  selectArticleById,
+  selectArticles,
+  selectCommentsByArticleId,
+  checkArticleExists,
+};
