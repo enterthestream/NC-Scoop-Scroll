@@ -84,5 +84,23 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "accepts a request body with username and body properties, and responds with posted comment",
+    "queries": [],
+    "exampleRequest": {
+      "username": "butter_bridge",
+      "body": "Mitch should definitely grow a handsome Dallas on his face, it would look glorious."
+    },
+    "exampleResponse": {
+      "comments": {
+        "comment_id": 19,
+        "votes": 0,
+        "created_at": "2020-11-23T17:00:00.000Z",
+        "author": "butter_bridge",
+        "body": "Mitch should definitely grow a handsome Dallas on his face, it would look glorious.",
+        "article_id": 12
+      }
+    }
   }
 }

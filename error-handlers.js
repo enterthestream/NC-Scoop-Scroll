@@ -14,6 +14,15 @@ exports.articleIdNotFound = (err, request, response, next) => {
   }
 };
 
+exports.usernameNotFound = (err, request, response, next) => {
+  if (err.code === "23503") {
+    const { username } = request.body;
+    response.status(404).send({ msg: `404 - ${username} not found` });
+  } else {
+    next(err);
+  }
+};
+
 exports.serverErrorHandler = (err, request, response, next) => {
   response.status(500).send({ msg: "Internal server error" });
 };
