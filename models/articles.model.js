@@ -74,6 +74,13 @@ function selectCommentsByArticleId(articleId) {
     });
 }
 
+function selectUsers() {
+  return db.query(`SELECT * FROM users`).then(({ rows }) => {
+    console.log(rows);
+    return rows;
+  });
+}
+
 function insertComment(articleId, author, body) {
   return db
     .query(
@@ -142,4 +149,5 @@ module.exports = {
   updateArticleVotes,
   removeCommentById,
   checkCommentExists,
+  selectUsers,
 };
