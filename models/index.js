@@ -4,6 +4,7 @@ const {
   selectCommentsByArticleId,
   checkArticleExists,
   insertComment,
+  updateArticleVotes,
 } = require("./articles.model");
 const { selectTopics } = require("./topics.models");
 
@@ -14,4 +15,5 @@ module.exports = {
   selectCommentsByArticleId,
   checkArticleExists,
   insertComment,
+  updateArticleVotes,
 };

@@ -81,6 +81,88 @@ describe("/api/articles/:article_id", () => {
         });
     });
   });
+  describe("PATCH", () => {
+    test("responds with a status 200 and updates article by article_id", () => {
+      const patchObj = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/articles/4")
+        .send(patchObj)
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article).toEqual({
+            article_id: 4,
+            title: "Student SUES Mitch!",
+            topic: "mitch",
+            author: "rogersop",
+            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+            created_at: "2020-05-06T01:14:00.000Z",
+            votes: 1,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+    test("responds with a status 400 when given an invalid type for article_id", () => {
+      const patchObj = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/articles/not-a-number")
+        .send(patchObj)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("400 - Bad request");
+        });
+    });
+    test("responds with a status 200 and updates article by article_id, when inc_votes is a string number", () => {
+      const patchObj = { inc_votes: "1" };
+      return request(app)
+        .patch("/api/articles/4")
+        .send(patchObj)
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article).toEqual({
+            article_id: 4,
+            title: "Student SUES Mitch!",
+            topic: "mitch",
+            author: "rogersop",
+            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+            created_at: "2020-05-06T01:14:00.000Z",
+            votes: 1,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+    test("responds with a status 400 when given an invalid type(a word, not a string number) for inc_votes", () => {
+      const patchObj = { inc_votes: "one" };
+      return request(app)
+        .patch("/api/articles/4")
+        .send(patchObj)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("400 - Bad request");
+        });
+    });
+    test("responds with a status 404 not found, when given a valid article_id type that does not exist", () => {
+      const patchObj = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/articles/808")
+        .send(patchObj)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("No article found under id 808");
+        });
+    });
+    test("responds with a status 400 when given an invalid type for article_id", () => {
+      const patchObj = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/articles/not-a-number")
+        .send(patchObj)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("400 - Bad request");
+        });
+    });
+  });
 });
 describe("/api/articles", () => {
   describe("GET", () => {

@@ -91,10 +91,27 @@ function insertComment(articleId, author, body) {
     });
 }
 
+function updateArticleVotes(articleId, incVotes) {
+  return db
+    .query(
+      `
+      UPDATE articles
+      SET votes = votes + $2
+      WHERE article_id = $1
+      RETURNING *
+      `,
+      [articleId, incVotes]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+}
+
 module.exports = {
   selectArticleById,
   selectArticles,
   selectCommentsByArticleId,
   checkArticleExists,
   insertComment,
+  updateArticleVotes,
 };
