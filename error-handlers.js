@@ -6,7 +6,7 @@ exports.invalidArticleIdType = (err, request, response, next) => {
   }
 };
 
-exports.articleIdNotFound = (err, request, response, next) => {
+exports.customErrorHandler = (err, request, response, next) => {
   if (err.status && err.msg) {
     response.status(err.status).send({ msg: err.msg });
   } else {
