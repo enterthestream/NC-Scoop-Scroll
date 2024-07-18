@@ -7,11 +7,12 @@ const {
   getCommentsByArticleId,
   postComment,
   patchArticleVotes,
+  deleteCommentById,
 } = require("./controllers");
 const {
   invalidArticleIdType,
-  articleIdNotFound,
   usernameNotFound,
+  customErrorHandler,
 } = require("./error-handlers");
 const app = express();
 
@@ -27,8 +28,10 @@ app.post("/api/articles/:article_id/comments", postComment);
 
 app.patch("/api/articles/:article_id", patchArticleVotes);
 
+app.delete("/api/comments/:comment_id", deleteCommentById);
+
 app.use(invalidArticleIdType);
-app.use(articleIdNotFound);
+app.use(customErrorHandler);
 app.use(usernameNotFound);
 
 app.all("*", (request, response, next) => {

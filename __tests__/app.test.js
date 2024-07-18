@@ -142,6 +142,26 @@ describe("/api/articles/:article_id", () => {
           expect(msg).toBe("400 - Bad request");
         });
     });
+    test("responds with a status 200 and updates article by article_id with negative votes", () => {
+      const patchObj = { inc_votes: -10 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(patchObj)
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 90,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
     test("responds with a status 404 not found, when given a valid article_id type that does not exist", () => {
       const patchObj = { inc_votes: 1 };
       return request(app)
@@ -308,6 +328,39 @@ describe("/api/articles/:article_id/comments", () => {
         .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("No article found under id 808");
+        });
+    });
+  });
+});
+describe("/api/comments/:comment_id", () => {
+  describe("DELETE", () => {
+    test("respond with a status 204 and no content, deletes the given comment by comment_id", () => {
+      return request(app)
+        .delete("/api/comments/4")
+        .expect(204)
+        .then(async ({ body }) => {
+          expect(body).toEqual({});
+          // check if comment has been deleted
+          const { rows } = await db.query(
+            "SELECT * FROM comments WHERE comment_id = 4"
+          );
+          expect(rows.length).toBe(0);
+        });
+    });
+    test("responds with a status 400 when given an invalid type for comment_id", () => {
+      return request(app)
+        .delete("/api/comments/not-a-number")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("400 - Bad request");
+        });
+    });
+    test("responds with a status 404 not found, when given a valid comment_id type that does not exist", () => {
+      return request(app)
+        .delete("/api/comments/808")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("No comment found under id 808");
         });
     });
   });
