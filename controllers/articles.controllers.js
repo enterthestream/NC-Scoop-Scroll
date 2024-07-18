@@ -7,6 +7,7 @@ const {
   updateArticleVotes,
   removeCommentById,
   checkCommentExists,
+  selectUsers,
 } = require("../models");
 
 exports.getArticles = (request, response, next) => {
@@ -15,7 +16,6 @@ exports.getArticles = (request, response, next) => {
       response.status(200).send({ articles });
     })
     .catch((err) => {
-      console.log(err);
       next(err);
     });
 };
@@ -42,6 +42,16 @@ exports.getCommentsByArticleId = (request, response, next) => {
     })
     .then((comments) => {
       response.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getUsers = (request, response, next) => {
+  selectUsers()
+    .then((users) => {
+      response.status(200).send({ users });
     })
     .catch((err) => {
       next(err);
