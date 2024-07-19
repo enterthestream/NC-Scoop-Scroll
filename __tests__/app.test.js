@@ -213,6 +213,60 @@ describe("/api/articles", () => {
           expect(articles).toBeSortedBy("created_at", { descending: true });
         });
     });
+    test("responds with a status 200 and articles order given by sort_by query column name, defaults to created_at descending", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(13);
+          expect(articles).toBeSortedBy("author", {
+            descending: true,
+          });
+        });
+    });
+    test("responds with a status 400 and error message for invalid sort_by query value", () => {
+      return request(app)
+        .get("/api/articles?sort_by=not_a_valid_column")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid query");
+        });
+    });
+  });
+  test("responds with a status 400 and error message for incorrect sort_by query parameter", () => {
+    return request(app)
+      .get("/api/articles?sorted_incorrect=title")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid query");
+      });
+  });
+  test("responds with a status 200 and takes an order query, which can be set to asc or desc (defaulting to descending)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy("title", {
+          ascending: true,
+        });
+      });
+  });
+  test("responds with a status 400 and error message for invalid order query value", () => {
+    return request(app)
+      .get("/api/articles?order=not_a_valid_query_value")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid query");
+      });
+  });
+  test("responds with a status 400 and error message for incorrect order query parameter", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&invalid_param=asc")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid query");
+      });
   });
 });
 describe("/api/articles/:article_id/comments", () => {

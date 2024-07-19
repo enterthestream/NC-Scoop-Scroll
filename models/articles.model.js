@@ -1,10 +1,26 @@
 const db = require("../db/connection");
 
-function selectArticles() {
-  return db
-    .query(
-      `
-    SELECT
+function selectArticles(sortBy = "created_at", order = "desc") {
+  console.log(sortBy);
+  const validSortBys = [
+    "author",
+    "title",
+    "topic",
+    "created_at",
+    "comment_count",
+    "votes",
+  ];
+
+  const validOrder = ["asc", "desc"];
+
+  if (!validSortBys.includes(sortBy)) {
+    return Promise.reject({ status: 400, msg: "Invalid query" });
+  }
+
+  if (!validOrder.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid query" });
+  }
+  const queryString = `SELECT
       articles.title,
       articles.author,
       articles.article_id,
@@ -16,14 +32,30 @@ function selectArticles() {
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id
     GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC;
-    `
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+    ORDER BY articles.${sortBy} ${order}
+    `;
+
+  return db.query(queryString).then(({ rows }) => {
+    return rows;
+  });
 }
 
+function checkValidQueryParams(requestQuery) {
+  return new Promise((resolve, reject) => {
+    const validQueryParams = ["sort_by", "order"];
+    const queryParams = Object.keys(requestQuery);
+
+    const invalidParams = queryParams.filter((param) => {
+      return !validQueryParams.includes(param);
+    });
+
+    if (invalidParams.length > 0) {
+      reject({ status: 400, msg: "Invalid query" });
+    } else {
+      resolve();
+    }
+  });
+}
 function selectArticleById(articleId) {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [articleId])
@@ -76,7 +108,6 @@ function selectCommentsByArticleId(articleId) {
 
 function selectUsers() {
   return db.query(`SELECT * FROM users`).then(({ rows }) => {
-    console.log(rows);
     return rows;
   });
 }
@@ -150,4 +181,5 @@ module.exports = {
   removeCommentById,
   checkCommentExists,
   selectUsers,
+  checkValidQueryParams,
 };
