@@ -8,20 +8,15 @@ const {
   removeCommentById,
   checkCommentExists,
   selectUsers,
-  checkValidQueryParams,
 } = require("../models");
 
 exports.getArticles = (request, response, next) => {
-  checkValidQueryParams(request.query)
-    .then(() => {
-      const { sort_by, order } = request.query;
-      return selectArticles(sort_by, order);
-    })
+  const { sort_by, order } = request.query;
+  selectArticles(sort_by, order)
     .then((articles) => {
       response.status(200).send({ articles });
     })
     .catch((err) => {
-      console.log(err);
       next(err);
     });
 };

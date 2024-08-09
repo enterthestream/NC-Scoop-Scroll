@@ -233,14 +233,7 @@ describe("/api/articles", () => {
         });
     });
   });
-  test("responds with a status 400 and error message for incorrect sort_by query parameter", () => {
-    return request(app)
-      .get("/api/articles?sorted_incorrect=title")
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Invalid query");
-      });
-  });
+
   test("responds with a status 200 and takes an order query, which can be set to asc or desc (defaulting to descending)", () => {
     return request(app)
       .get("/api/articles?sort_by=title&order=asc")
@@ -255,14 +248,6 @@ describe("/api/articles", () => {
   test("responds with a status 400 and error message for invalid order query value", () => {
     return request(app)
       .get("/api/articles?order=not_a_valid_query_value")
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Invalid query");
-      });
-  });
-  test("responds with a status 400 and error message for incorrect order query parameter", () => {
-    return request(app)
-      .get("/api/articles?sort_by=title&invalid_param=asc")
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Invalid query");
@@ -386,6 +371,7 @@ describe("/api/articles/:article_id/comments", () => {
     });
   });
 });
+
 describe("/api/comments/:comment_id", () => {
   describe("DELETE", () => {
     test("respond with a status 204 and no content, deletes the given comment by comment_id", () => {

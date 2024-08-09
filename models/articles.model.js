@@ -1,7 +1,6 @@
 const db = require("../db/connection");
 
 function selectArticles(sortBy = "created_at", order = "desc") {
-  console.log(sortBy);
   const validSortBys = [
     "author",
     "title",
@@ -40,22 +39,6 @@ function selectArticles(sortBy = "created_at", order = "desc") {
   });
 }
 
-function checkValidQueryParams(requestQuery) {
-  return new Promise((resolve, reject) => {
-    const validQueryParams = ["sort_by", "order"];
-    const queryParams = Object.keys(requestQuery);
-
-    const invalidParams = queryParams.filter((param) => {
-      return !validQueryParams.includes(param);
-    });
-
-    if (invalidParams.length > 0) {
-      reject({ status: 400, msg: "Invalid query" });
-    } else {
-      resolve();
-    }
-  });
-}
 function selectArticleById(articleId) {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [articleId])
@@ -181,5 +164,4 @@ module.exports = {
   removeCommentById,
   checkCommentExists,
   selectUsers,
-  checkValidQueryParams,
 };
