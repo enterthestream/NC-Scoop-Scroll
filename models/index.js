@@ -8,7 +8,6 @@ const {
   removeCommentById,
   checkCommentExists,
   selectUsers,
-  checkValidQueryParams,
 } = require("./articles.model");
 const { selectTopics } = require("./topics.models");
 
@@ -23,5 +22,4 @@ module.exports = {
   removeCommentById,
   checkCommentExists,
   selectUsers,
-  checkValidQueryParams,
 };

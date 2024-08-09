@@ -253,7 +253,40 @@ describe("/api/articles", () => {
         expect(msg).toBe("Invalid query");
       });
   });
+  test("accepts a topic query, responds with a status 200 and an array of articles filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: "mitch",
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(String),
+          });
+        });
+      });
+  });
+  test("responds with a status 400 and error message for invalid order query value", () => {
+    return request(app)
+      .get("/api/articles?topic=not_a_valid_topic")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid query, topic does not exist");
+      });
+  });
 });
+
+describe("/api/articles?topic", () => {
+  describe("GET", () => {});
+});
+
 describe("/api/articles/:article_id/comments", () => {
   describe("GET", () => {
     test("responds with a status 200 and an array of comments for the given article_id, with the specified properties", () => {
