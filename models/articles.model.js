@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 
-function selectArticles(sortBy = "created_at", order = "desc") {
+async function selectArticles(sortBy = "created_at", order = "desc", topic) {
   const validSortBys = [
     "author",
     "title",
@@ -12,6 +12,8 @@ function selectArticles(sortBy = "created_at", order = "desc") {
 
   const validOrder = ["asc", "desc"];
 
+  const validTopics = await selectValidTopics();
+
   if (!validSortBys.includes(sortBy)) {
     return Promise.reject({ status: 400, msg: "Invalid query" });
   }
@@ -19,7 +21,15 @@ function selectArticles(sortBy = "created_at", order = "desc") {
   if (!validOrder.includes(order)) {
     return Promise.reject({ status: 400, msg: "Invalid query" });
   }
-  const queryString = `SELECT
+
+  if (topic && !validTopics.includes(topic)) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid query, topic does not exist",
+    });
+  }
+
+  let queryString = `SELECT
       articles.title,
       articles.author,
       articles.article_id,
@@ -29,13 +39,26 @@ function selectArticles(sortBy = "created_at", order = "desc") {
       articles.article_img_url,
       COUNT(comments.comment_id) AS comment_count
     FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id
-    ORDER BY articles.${sortBy} ${order}
-    `;
+    LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
-  return db.query(queryString).then(({ rows }) => {
+  const queryParams = [];
+
+  if (topic) {
+    queryString += `WHERE articles.topic = $1 `;
+    queryParams.push(topic);
+  }
+
+  queryString += `GROUP BY articles.article_id
+ORDER BY articles.${sortBy} ${order}`;
+
+  return db.query(queryString, queryParams).then(({ rows }) => {
     return rows;
+  });
+}
+
+function selectValidTopics() {
+  return db.query("SELECT slug FROM topics").then(({ rows }) => {
+    return rows.map((row) => row.slug);
   });
 }
 
