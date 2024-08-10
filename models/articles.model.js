@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { sort } = require("../db/data/development-data/articles");
 
 async function selectArticles(sortBy = "created_at", order = "desc", topic) {
   const validSortBys = [
@@ -48,8 +49,13 @@ async function selectArticles(sortBy = "created_at", order = "desc", topic) {
     queryParams.push(topic);
   }
 
-  queryString += `GROUP BY articles.article_id
-ORDER BY articles.${sortBy} ${order}`;
+  queryString += `GROUP BY articles.article_id `;
+
+  if (sortBy === "comment_count") {
+    queryString += `GROUP BY comment_count ${order}`;
+  } else {
+    queryString += `ORDER BY articles.${sortBy} ${order}`;
+  }
 
   return db.query(queryString, queryParams).then(({ rows }) => {
     return rows;
