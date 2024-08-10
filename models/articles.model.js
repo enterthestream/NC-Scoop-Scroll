@@ -52,7 +52,7 @@ async function selectArticles(sortBy = "created_at", order = "desc", topic) {
   queryString += `GROUP BY articles.article_id `;
 
   if (sortBy === "comment_count") {
-    queryString += `GROUP BY comment_count ${order}`;
+    queryString += `ORDER BY comment_count ${order}`;
   } else {
     queryString += `ORDER BY articles.${sortBy} ${order}`;
   }
